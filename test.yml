@@ -1,0 +1,20 @@
+---
+- name: Test Linux Servers
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Show hostname
+      ansible.builtin.command: hostname
+      register: hostname_result
+
+    - name: Show hostname result
+      ansible.builtin.debug:
+        var: hostname_result.stdout
+
+    - name: Show uptime
+      ansible.builtin.command: uptime
+      register: uptime_result
+
+    - name: Show uptime result
+      ansible.builtin.debug:
+        var: uptime_result.stdout
