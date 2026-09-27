@@ -1,20 +1,29 @@
 ---
-- name: Test Linux Servers
+- name: Linux Server Inventory Collection
   hosts: all
   gather_facts: true
+
   tasks:
-    - name: Show hostname
-      ansible.builtin.command: hostname
-      register: hostname_result
 
-    - name: Show hostname result
+    - name: Display Linux server inventory
       ansible.builtin.debug:
-        var: hostname_result.stdout
+        msg:
+          Hostname: "{{ ansible_facts.hostname }}"
+          FQDN: "{{ ansible_facts.fqdn | default('N/A') }}"
+          IP_Address: "{{ ansible_facts.default_ipv4.address | default('N/A') }}"
+          OS: "{{ ansible_facts.distribution }}"
+          OS_Version: "{{ ansible_facts.distribution_version }}"
+          Kernel: "{{ ansible_facts.kernel }}"
+          Architecture: "{{ ansible_facts.architecture }}"
+          CPU_Cores: "{{ ansible_facts.processor_vcpus }}"
+          Memory_GB: "{{ (ansible_facts.memtotal_mb / 1024) | round(1) }}"
+          Uptime_Hours: "{{ (ansible_facts.uptime_seconds / 3600) | round(1) }}"
 
-    - name: Show uptime
-      ansible.builtin.command: uptime
-      register: uptime_result
+    - name: Check root filesystem
+      ansible.builtin.command: df -h /
+      register: root_disk
+      changed_when: false
 
-    - name: Show uptime result
+    - name: Display root filesystem
       ansible.builtin.debug:
-        var: uptime_result.stdout
+        var: root_disk.stdout
